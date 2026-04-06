@@ -1,17 +1,48 @@
 "use client";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { gsap } from "gsap";
+import { Bus, Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-import { useState, useEffect } from "react";
+
 import Link from "next/link";
 
-export default function Header() {
+interface NavbarProps {
+    activeSection: string;
+    onNavigate: (section: string) => void;
+}
+
+export default function Navbar({ activeSection, onNavigate }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+ useEffect(() => {
+        if (navRef.current) {
+            gsap.fromTo(
+                navRef.current,
+                { y: -100, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: "power3.out", delay: 0.2 }
+            );
+        }
+    }, []);
+
+    const handleNav = (id: string) => {
+        onNavigate(id);
+        setMobileOpen(false);
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth" });
+        }
+    };
 
   const navLinks = [
     { label: "Home", href: "/" },
